@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Private School Class Reservation</title>
+    <style>
+        :root {
+            --primary: #1e3a8a; /* Professional Dark Blue */
+            --accent: #10b981;  /* Sleek Green */
+            --bg: #f8fafc;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+        }
+        .form-container {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+            max-width: 450px;
+            width: 100%;
+        }
+        h2 { color: var(--primary); margin-top: 0; text-align: center; }
+        .input-group { margin-bottom: 18px; }
+        label { display: block; margin-bottom: 6px; font-weight: 500; color: #334155; }
+        input, select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            box-sizing: border-box;
+            font-size: 14px;
+        }
+        input:focus, select:focus {
+            outline: 2px solid var(--primary);
+        }
+        button {
+            width: 100%;
+            background: var(--accent);
+            color: white;
+            border: none;
+            padding: 12px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+        button:hover { opacity: 0.9; }
+        #message { margin-top: 15px; text-align: center; font-weight: 500; }
+    </style>
+</head>
+<body>
+
+<div class="form-container">
+    <h2>Book Your Class</h2>
+    <form id="bookingForm">
+        <div class="input-group">
+            <label>Google Email</label>
+            <input type="email" id="email" required placeholder="student@email.com">
+        </div>
+        <div class="input-group">
+            <label>Phone Number</label>
+            <input type="tel" id="phone" required placeholder="e.g., +123456789">
+        </div>
+        <div class="input-group">
+            <label>Student Names (Comma separated)</label>
+            <input type="text" id="studentNames" required placeholder="John Doe, Jane Doe">
+        </div>
+        <div class="input-group">
+            <label>Student Count</label>
+            <input type="number" id="studentCount" min="1" required placeholder="1">
+        </div>
+        <div class="input-group">
+            <label>Select Day</label>
+            <input type="date" id="slotDay" required>
+        </div>
+        <div class="input-group">
+            <label>Select Time Slot</label>
+            <select id="slotTime" required>
+                <option value="">Choose a time...</option>
+                <option value="09:00 AM">09:00 AM</option>
+                <option value="11:00 AM">11:00 AM</option>
+                <option value="02:00 PM">02:00 PM</option>
+                <option value="04:00 PM">04:00 PM</option>
+            </select>
+        </div>
+        <button type="submit" id="submitBtn">Confirm Reservation</button>
+        <div id="message"></div>
+    </form>
+</div>
+
+<script>
+    const scriptUrl = 'https://script.google.com/macros/s/AKfycbypDmR-5VDTdtHLGX6Jkhb3ZUWz5_lLKS7vE7qNb6B9uTKvWTQgDoqYGvPbFDFEAJQG/exec';
+
+    document.getElementById('bookingForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const submitBtn = document.getElementById('submitBtn');
+        const messageDiv = document.getElementById('message');
+        
+        submitBtn.disabled = true;
+        submitBtn.innerText = "Submitting...";
+        messageDiv.innerText = "";
+
+        const payload = {
+            email: document.getElementById('email').value,
+            phone: document.getElementById('phone').value,
+            studentNames: document.getElementById('studentNames').value,
+            studentCount: parseInt(document.getElementById('studentCount').value),
+            slotDay: document.getElementById('slotDay').value,
+            slotTime: document.getElementById('slotTime').value
+        };
+
+        try {
+            const response = await fetch(scriptUrl, {
+                method: 'POST',
+                mode: 'no-cors', // Essential bypass for cross-origin tracking browser restrictions
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+
+            messageDiv.style.color = "green";
+            messageDiv.innerText = "Reservation sent! An instructor will call you soon.";
+            document.getElementById('bookingForm').reset();
+        } catch (error) {
+            messageDiv.style.color = "red";
+            messageDiv.innerText = "Something went wrong. Please try again.";
+            console.error(error);
+        } finally {
+            submitBtn.disabled = false;
+            submitBtn.innerText = "Confirm Reservation";
+        }
+    });
+</script>
+
+</body>
+</html>
